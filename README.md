@@ -34,18 +34,13 @@ func main() {
     })
 
     if err != nil {
-        fmt.Println(err)
-        return
+        panic(err)
     }
 
-    output, err := malgwo_inst.Exec(nil)
+    malgwo_inst.Exec(nil)
 
-    if err != nil {
-        fmt.Println(err)
-        return
-    }
+    defer malgwo_inst.Close()
 
-    fmt.Println(output)
 }
 ```
 
@@ -75,18 +70,13 @@ func main() {
     })
 
     if err != nil {
-        fmt.Println(err)
-        return
+        panic(err)
     }
 
-    output, err := malgwo_inst.Exec(nil)
+    malgwo_inst.Exec(nil)
 
-    if err != nil {
-        fmt.Println(err)
-        return
-    }
+    defer malgwo_inst.Close()
 
-    fmt.Println(output)
 }
 ```
 

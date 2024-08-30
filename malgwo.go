@@ -37,42 +37,49 @@ type Malwgo struct {
 // Exec executes the command with the given arguments. If handleErr is not nil, it will be called with the error if one occurs.
 // Example:
 //
-// handleErr can be usefull to controll the error instead of returning it directly:
+// handleErr can be usefull to controll the error instead of using the default behavior of the function:
 //
-//	output, err := malwgo.Exec(func(err error) {
+//	malwgo.Exec(func(output []byte{}, err error) {
 //		fmt.Println(err)
+//		fmt.Println(string(output))
 //	}, "--help")
-//
-// or handleErr can be nil:
-//
-//	output, err := malwgo.Exec(nil, "--help")
-func (o Malwgo) Exec(handleErr func(error), args ...string) (output []byte, err error) {
-
-	if o.opts.onStart != nil {
-		o.opts.onStart()
-	}
+func (o Malwgo) Exec(handle func(output []byte, err error), args ...string) {
 
 	if o.opts.onBackground != nil {
 		go o.opts.onBackground()
 	}
 
-	cmd := o.wrapper.Command(args...)
+	go func() {
 
-	output, err = cmd.Output()
-
-	if err != nil {
-		if handleErr != nil {
-			handleErr(err)
-		} else {
-			return
+		if o.opts.onStart != nil {
+			o.opts.onStart()
 		}
-	}
 
-	if o.opts.onStop != nil {
-		o.opts.onStop()
-	}
+		cmd := o.wrapper.Command(args...)
 
-	return
+		output, err := cmd.Output()
+
+		if err != nil {
+			if handle != nil {
+				handle([]byte{}, err)
+				if o.opts.onStop != nil {
+					o.opts.onStop()
+				}
+			} else if o.opts.onStop != nil {
+				o.opts.onStop()
+				return
+			}
+		}
+
+		if handle != nil {
+			handle(output, nil)
+		}
+
+		if o.opts.onStop != nil {
+			o.opts.onStop()
+		}
+
+	}()
 
 }
 
