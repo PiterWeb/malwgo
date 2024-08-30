@@ -89,3 +89,7 @@ func main() {
     fmt.Println(output)
 }
 ```
+
+### Thank you [amenzhinsky](github.com/amenzhinsky) for the [go-memexec](github.com/amenzhinsky/go-memexec) library
+
+It is a very interesting library that allows to run a binary in memory. This project is a wrapper around it.
